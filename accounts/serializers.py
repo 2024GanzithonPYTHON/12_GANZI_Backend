@@ -1,37 +1,44 @@
+# ganzithon/accounts/serializers.py
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from allauth.account.adapter import get_adapter
 from rest_framework import serializers
 from .models import CustomUser
 
+# 유저 정보 상세 시리얼라이저
 class CustomUserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id', 'username', 'password', 'nickname', 'university', 'location']
-        
-class CustomRegisterSerializer(RegisterSerializer):
-    nickname = serializers.CharField(max_length=100)
-    university = serializers.CharField(max_length=50)
-    location = serializers.CharField(max_length=200)
-    
-    def get_cleaned_data(self):
-        super(CustomRegisterSerializer, self).get_cleaned_data()
-        return {
-            'username': self.validated_data.get('username', ''),
-            'password1': self.validated_data.get('password1', ''),
-            'password2': self.validated_data.get('password2', ''),
-            'nickname': self.validated_data.get('nickname', ''),
-            'university': self.validated_data.get('university', ''),
-            'location': self.validated_data.get('location', ''),
+        fields = ['id', 'username', 'password', 'nickname']
+        extra_kwargs = {
+            'password': {'write_only': True}
         }
-    
-    def save(self, request):
-        adapter = get_adapter()
-        user = adapter.new_user(request)
-        self.cleaned_data = self.get_cleaned_data()
-        user.username = self.cleaned_data.get('username')
-        user.nickname = self.cleaned_data.get('nickname')
-        user.university = self.cleaned_data.get('university')
-        user.location = self.cleaned_data.get('location')
+
+# 유저 정보 생성 시리얼라이저
+class CustomRegisterSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(write_only=True)
+    password_confirm = serializers.CharField(write_only=True)
+    nickname = serializers.CharField(max_length=100)
+
+    def validate(self, data):
+        # 비밀번호 확인
+        if data['password'] != data['password_confirm']:
+            raise serializers.ValidationError({"password_confirm": ["Passwords do not match."]})
+
+        # username 중복 확인
+        if CustomUser.objects.filter(username=data['username']).exists():
+            raise serializers.ValidationError({"username": ["A user with that username already exists."]})
+
+        # nickname 중복 확인
+        if CustomUser.objects.filter(nickname=data['nickname']).exists():
+            raise serializers.ValidationError({"nickname": ["This nickname is already taken."]})
+
+        return data
+
+    def create(self, validated_data):
+        user = CustomUser(
+            username=validated_data['username'],
+            nickname=validated_data['nickname']
+        )
+        user.set_password(validated_data['password'])
         user.save()
-        adapter.save_user(request, user, self)
         return user
