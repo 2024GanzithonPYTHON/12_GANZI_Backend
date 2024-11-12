@@ -1,3 +1,4 @@
+# ganzithon/purchase/apps.py
 from django.apps import AppConfig
 
 
