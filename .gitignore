@@ -3,3 +3,7 @@ myvenv/
 
 # Ignore environment variables file
 .env
+
+.celerybeat-schedule.db
+
+.db.sqlite3
