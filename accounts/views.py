@@ -105,7 +105,11 @@ def create_user_info(request):
     postal_code = request.data.get('postal_code')
     city = request.data.get('city')
     address1 = request.data.get('address1')
-    address2 = request.data.get('address2')  # 선택 사항
+    address2 = request.data.get('address2')  
+    birthday = request.data.get('birthday')  
+    current_status = request.data.get('current_status')  
+    relationship_with_child = request.data.get('relationship_with_child')  
+    child_name = request.data.get('child_name')  
 
     errors = {}
     if not email:
@@ -116,6 +120,14 @@ def create_user_info(request):
         errors['city'] = ["This field is required."]
     if not address1:
         errors['address1'] = ["This field is required."]
+    if not birthday:
+        errors['birthday'] = ["This field is required."]
+    if not current_status:
+        errors['current_status'] = ["This field is required."]
+    if not relationship_with_child:
+        errors['relationship_with_child'] = ["This field is required."]
+    if not child_name:
+        errors['child_name'] = ["This field is required."]
 
     if errors:
         return Response(errors, status=status.HTTP_400_BAD_REQUEST)
@@ -125,7 +137,11 @@ def create_user_info(request):
     user.postal_code = postal_code
     user.city = city
     user.address1 = address1
-    user.address2 = address2  # 선택 사항으로 저장
+    user.address2 = address2  # 선택 사항
+    user.birthday = birthday
+    user.current_status = current_status
+    user.relationship_with_child = relationship_with_child
+    user.child_name = child_name
     user.save()
 
     return Response({
@@ -138,5 +154,9 @@ def create_user_info(request):
             "city": user.city,
             "address1": user.address1,
             "address2": user.address2
-        }
+        },
+        "birthday": user.birthday,
+        "current_status": user.current_status,
+        "relationship_with_child": user.relationship_with_child,
+        "child_name": user.child_name
     }, status=status.HTTP_200_OK)
