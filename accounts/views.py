@@ -91,72 +91,133 @@ def delete_user(request):
     if not user.check_password(password):
         return Response({"error": "Incorrect password."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # 사용자 삭제
     user.delete()
     return Response({"detail": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_200_OK)
 
-# 유저 정보 생성
-@api_view(['POST'])
+# 유저 정보 조회, 생성 및 수정
+@api_view(['GET', 'POST', 'PUT'])
 @permission_classes([IsAuthenticated])
-def create_user_info(request):
+def user_info(request):
     user = request.user
 
-    email = request.data.get('email')
-    postal_code = request.data.get('postal_code')
-    city = request.data.get('city')
-    address1 = request.data.get('address1')
-    address2 = request.data.get('address2')  
-    birthday = request.data.get('birthday')  
-    current_status = request.data.get('current_status')  
-    relationship_with_child = request.data.get('relationship_with_child')  
-    child_name = request.data.get('child_name')  
+    if request.method == 'GET':
+        # 유저 정보 조회
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "nickname": user.nickname,
+            "email": user.email,
+            "address": {
+                "postal_code": user.postal_code,
+                "city": user.city,
+                "address1": user.address1,
+                "address2": user.address2
+            },
+            "birthday": user.birthday,
+            "current_status": user.current_status,
+            "relationship_with_child": user.relationship_with_child,
+            "child_name": user.child_name
+        }, status=status.HTTP_200_OK)
 
-    errors = {}
-    if not email:
-        errors['email'] = ["This field is required."]
-    if not postal_code:
-        errors['postal_code'] = ["This field is required."]
-    if not city:
-        errors['city'] = ["This field is required."]
-    if not address1:
-        errors['address1'] = ["This field is required."]
-    if not birthday:
-        errors['birthday'] = ["This field is required."]
-    if not current_status:
-        errors['current_status'] = ["This field is required."]
-    if not relationship_with_child:
-        errors['relationship_with_child'] = ["This field is required."]
-    if not child_name:
-        errors['child_name'] = ["This field is required."]
+    elif request.method == 'POST':
+        # 유저 정보 생성
+        email = request.data.get('email')
+        postal_code = request.data.get('postal_code')
+        city = request.data.get('city')
+        address1 = request.data.get('address1')
+        address2 = request.data.get('address2')  # 선택 사항
+        birthday = request.data.get('birthday')
+        current_status = request.data.get('current_status')
+        relationship_with_child = request.data.get('relationship_with_child')
+        child_name = request.data.get('child_name')
 
-    if errors:
-        return Response(errors, status=status.HTTP_400_BAD_REQUEST)
+        errors = {}
+        if not email:
+            errors['email'] = ["This field is required."]
+        if not postal_code:
+            errors['postal_code'] = ["This field is required."]
+        if not city:
+            errors['city'] = ["This field is required."]
+        if not address1:
+            errors['address1'] = ["This field is required."]
+        if not birthday:
+            errors['birthday'] = ["This field is required."]
+        if not current_status:
+            errors['current_status'] = ["This field is required."]
+        if not relationship_with_child:
+            errors['relationship_with_child'] = ["This field is required."]
+        if not child_name:
+            errors['child_name'] = ["This field is required."]
 
-    # 유저 정보 저장
-    user.email = email
-    user.postal_code = postal_code
-    user.city = city
-    user.address1 = address1
-    user.address2 = address2  # 선택 사항
-    user.birthday = birthday
-    user.current_status = current_status
-    user.relationship_with_child = relationship_with_child
-    user.child_name = child_name
-    user.save()
+        if errors:
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
-    return Response({
-        "id": user.id,
-        "username": user.username,
-        "nickname": user.nickname,
-        "email": user.email,
-        "address": {
-            "postal_code": user.postal_code,
-            "city": user.city,
-            "address1": user.address1,
-            "address2": user.address2
-        },
-        "birthday": user.birthday,
-        "current_status": user.current_status,
-        "relationship_with_child": user.relationship_with_child,
-        "child_name": user.child_name
-    }, status=status.HTTP_200_OK)
+        # 유저 정보 저장
+        user.email = email
+        user.postal_code = postal_code
+        user.city = city
+        user.address1 = address1
+        user.address2 = address2  # 선택 사항
+        user.birthday = birthday
+        user.current_status = current_status
+        user.relationship_with_child = relationship_with_child
+        user.child_name = child_name
+        user.save()
+
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "nickname": user.nickname,
+            "email": user.email,
+            "address": {
+                "postal_code": user.postal_code,
+                "city": user.city,
+                "address1": user.address1,
+                "address2": user.address2
+            },
+            "birthday": user.birthday,
+            "current_status": user.current_status,
+            "relationship_with_child": user.relationship_with_child,
+            "child_name": user.child_name
+        }, status=status.HTTP_200_OK)
+
+    elif request.method == 'PUT':
+        # 유저 정보 수정
+        email = request.data.get('email', user.email)
+        postal_code = request.data.get('postal_code', user.postal_code)
+        city = request.data.get('city', user.city)
+        address1 = request.data.get('address1', user.address1)
+        address2 = request.data.get('address2', user.address2)  # 선택 사항
+        birthday = request.data.get('birthday', user.birthday)
+        current_status = request.data.get('current_status', user.current_status)
+        relationship_with_child = request.data.get('relationship_with_child', user.relationship_with_child)
+        child_name = request.data.get('child_name', user.child_name)
+
+        # 유저 정보 수정
+        user.email = email
+        user.postal_code = postal_code
+        user.city = city
+        user.address1 = address1
+        user.address2 = address2  # 선택 사항
+        user.birthday = birthday
+        user.current_status = current_status
+        user.relationship_with_child = relationship_with_child
+        user.child_name = child_name
+        user.save()
+
+        return Response({
+            "id": user.id,
+            "username": user.username,
+            "nickname": user.nickname,
+            "email": user.email,
+            "address": {
+                "postal_code": user.postal_code,
+                "city": user.city,
+                "address1": user.address1,
+                "address2": user.address2
+            },
+            "birthday": user.birthday,
+            "current_status": user.current_status,
+            "relationship_with_child": user.relationship_with_child,
+            "child_name": user.child_name
+        }, status=status.HTTP_200_OK)
