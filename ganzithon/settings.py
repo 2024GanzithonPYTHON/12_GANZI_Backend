@@ -32,7 +32,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 from decouple import config
 
-SECRET_KEY = 'django-insecure-#rht26^rxdp^yv*llk&ibct#-2da&1r+13d*%p&qut^pp89_yg'
+SECRET_KEY = config('SECRET_KEY')
 EMAIL_HOST='smtp.your-email-provider.com'
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
