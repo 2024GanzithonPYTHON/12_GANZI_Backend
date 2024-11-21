@@ -10,13 +10,17 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
+import email
 import os 
 
 from pathlib import Path
 
 from datetime import timedelta
 
+# import ex
 from celery.schedules import crontab
+from django.core.mail.backends import smtp
+from pip._internal.resolution.resolvelib import provider
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,14 +32,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 from decouple import config
 
-SECRET_KEY = config('SECRET_KEY')
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
+SECRET_KEY = 'django-insecure-#rht26^rxdp^yv*llk&ibct#-2da&1r+13d*%p&qut^pp89_yg'
+EMAIL_HOST='smtp.your-email-provider.com'
+EMAIL_PORT=587
+EMAIL_USE_TLS=True
+EMAIL_HOST_USER='admin@example.com'
+EMAIL_HOST_PASSWORD='admin1234'
+DEFAULT_FROM_EMAIL='admin@ganzithon.com'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
