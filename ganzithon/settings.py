@@ -11,10 +11,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import email
-import os 
-
+import os
+import json
 from pathlib import Path
-
+from django.core.exceptions import ImproperlyConfigured
 from datetime import timedelta
 
 # import ex
@@ -32,19 +32,34 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 from decouple import config
 
-SECRET_KEY = config('SECRET_KEY')
+secret_file = os.path.join(BASE_DIR, 'secrets.json')
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(setting)
+        raise ImproperlyConfigured(error_msg)
+
+SECRET_KEY = get_secret('SECRET_KEY')
 EMAIL_HOST='smtp.your-email-provider.com'
 EMAIL_PORT=587
 EMAIL_USE_TLS=True
 EMAIL_HOST_USER='admin@example.com'
-EMAIL_HOST_PASSWORD='admin1234'
+EMAIL_HOST_PASSWORD = get_secret('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL='admin@ganzithon.com'
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+# 배포 단계에서의 설정
+DEBUG = False
+
+ALLOWED_HOSTS = ['*', '.pythonanywhere.com']
 
 
 # Application definition
@@ -226,8 +241,14 @@ SIMPLE_JWT = {
     'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
 }
 
+
+
 # MEDIA 설정 추가
 STATIC_URL = '/static/'
+
+# 배포 위한 설정으로 추가
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
