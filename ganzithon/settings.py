@@ -85,6 +85,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
 	# simple-jwt 관련
 	'rest_framework_simplejwt',
+    # CORS 관련 설정
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -96,6 +98,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'ganzithon.urls'
@@ -118,6 +121,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ganzithon.wsgi.application'
 
+CORS_ALLOW_ALL_ORIGINS = True
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
