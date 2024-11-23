@@ -8,6 +8,8 @@ myvenv/
 
 *.pyc
 __pycache__/
+staticfiles/
+
 .db.sqlite3
 
 secrets.json
