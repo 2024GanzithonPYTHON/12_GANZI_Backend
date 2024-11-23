@@ -6,6 +6,8 @@ myvenv/
 
 .celerybeat-schedule.db
 
+*.pyc
+__pycache__/
 .db.sqlite3
 
 secrets.json
